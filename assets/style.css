@@ -10,6 +10,7 @@ html {
 nav ul {
   padding: 0;
   margin: 0;
+  margin-left: -.6em;
   list-style-type: none;
 }
 
