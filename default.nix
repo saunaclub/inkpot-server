@@ -1,11 +1,11 @@
 { lib, buildGoModule, fetchFromGitHub, stdenv, glibc }:
 
 buildGoModule rec {
-  pname = "inkpot-cli";
+  pname = "inkpot-server";
   version = "0.0.1";
 
   src = ./.;
-  vendorSha256 = "sha256-+NV7tsw76n4PIYjeSU9SqyzMdv7OoRJA1TANqhJcR9I=";
+  vendorSha256 = "sha256-eUHsSpvvzp6HWdmsKMwBuO+fmTr658U0ZYOhgndJhgA=";
 
   buildInputs = [
     stdenv
@@ -14,8 +14,8 @@ buildGoModule rec {
   ldflags = "-linkmode external -extldflags -static";
 
   meta = with lib; {
-    description = "Command-line tool to generate 4-bit grayscale images";
-    homepage = "https://github.com/saunaclub/inkpot-cli/";
+    description = "A smol social network spilling onto your e-paper display";
+    homepage = "https://github.com/saunaclub/inkpot-server/";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [];
   };
