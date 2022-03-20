@@ -1,0 +1,12 @@
+html {
+  margin: 0 auto;
+  padding: 48px;
+  min-height: 100vh;
+  max-width: 960px;
+  font-family: sans-serif;
+  line-height: 1.2;
+}
+
+form label {
+  display: block
+}

@@ -6,22 +6,28 @@
         <title>Inkpot - Upload Image</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./assets/style.css">
     </head>
     <body>
         <nav>
             <ul>
                 <li><a href="/">Global feed</a></li>
                 <li><a href="/upload">Add image</a></li>
+                <li><a href="/about">About this page</a></li>
             </ul>
         </nav>
-        <form method="POST" id="upload" action="/upload">
-           <label>
-               Channels, separated by comma: <input type="text" name="channel">
-           </label>
-           <label>
-               Image: <input type="file" accept="image/png, image/jpeg" name="file">
-           </label>
-           <input type="submit" value="Yeet!">
-        </form>
+        <main>
+            <h1>Inkpot</h1>
+            <h2>Upload Image</h2>
+            <form method="POST" id="upload" action="/upload">
+                <label>
+                    Channels, separated by comma: <input type="text" name="channel">
+                </label>
+                <label>
+                    Image: <input type="file" accept="image/png, image/jpeg" name="file">
+                </label>
+                <input type="submit" value="Yeet!">
+            </form>
+        </main>
     </body>
 </html>

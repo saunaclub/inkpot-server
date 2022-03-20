@@ -1,6 +1,9 @@
 /result
 /inkpot-server
 /main
+/inkpot.db
+/inkpot.db-shm
+/inkpot.db-wal
 *.epd
 *.gz
 *.jpg
