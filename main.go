@@ -55,21 +55,21 @@ func setupDb(dbPath string) *sql.DB {
 	return conn
 }
 
-func GetFeed(afterTimestamp *time.Time) []FeedItemJson {
-	timestamp, err := afterTimestamp.MarshalJSON()
-	if err != nil {
-		log.Fatalf("Could not convert timestamp: %s", err)
-	}
+func GetFeed(since *time.Time) []FeedItemJson {
+	timefmt := "2006-01-02 15:04:05"
+	timestamp := since.Format(timefmt)
 	rows, err := conn.Query(`
 		SELECT id, filepath, channels, datetime
         FROM feed
+        WHERE datetime > ?
+        ORDER BY datetime
+        LIMIT 10
     `, timestamp)
 	if err != nil {
 		log.Fatalf("Error generating feed: %s", err)
 	}
 	defer rows.Close()
 
-	timefmt := "2006-01-02 15:04:05"
 	var items = make([]FeedItemJson, 0)
 	for rows.Next() {
 		item := new(FeedItemRaw)
@@ -103,8 +103,8 @@ func getUploadHandler(c *gin.Context) {
 }
 
 func getFeedHandler(c *gin.Context) {
-	loc := time.FixedZone("UTC", 0-8*60*60)
-	t := time.Date(1970, time.January, 10, 0, 0, 0, 0, loc)
+	loc := time.FixedZone("UTC", 0)
+	t := time.Date(1970, time.January, 1, 0, 0, 0, 0, loc)
 	feed := GetFeed(&t)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -114,31 +114,44 @@ func getFeedHandler(c *gin.Context) {
 
 func postUploadHandler(c *gin.Context) {
 	file, err := c.FormFile("file")
+	channels := c.PostForm("channels")
 
 	// The file cannot be received.
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "No file is received",
+		c.HTML(http.StatusOK, "upload.html", gin.H{
+			"error": "Please select a file to upload.",
 		})
 		return
+	}
+
+	if channels == "" {
+		channels = "default"
 	}
 
 	// Retrieve file information
 	// extension := filepath.Ext(file.Filename)
 	// Generate random file name for the new uploaded file so it doesn't override the old file with same name
 	newFileName := fmt.Sprintf("%d-%s", time.Now().Unix(), file.Filename)
+	path := "./uploads/" + newFileName
 
 	// The file is received, so let's save it
-	if err := c.SaveUploadedFile(file, "./uploads/"+newFileName); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Unable to save the file",
+	if err := c.SaveUploadedFile(file, path); err != nil {
+		c.HTML(http.StatusOK, "upload.html", gin.H{
+			"error": "Could not save uploaded file.",
 		})
 		return
 	}
 
+	if _, err := conn.Exec(`
+		INSERT INTO feed (filepath, channels, datetime)
+		VALUES (?, ?, datetime("now"))
+	`, path, channels); err != nil {
+		log.Fatalf("Error creating database entry while uploading: %s", err)
+	}
+
 	// File saved successfully. Return proper result
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Your file has been successfully uploaded.",
+	c.HTML(http.StatusOK, "upload.html", gin.H{
+		"info": "Thanks! Your image was added to the feed.",
 	})
 }
 

@@ -7,6 +7,41 @@ html {
   line-height: 1.2;
 }
 
+nav ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+nav ul li {
+  display: inline-block;
+}
+
+nav ul li + li:before {
+  content: ' | '
+}
+
+nav ul li a {
+  padding: .3em .6em;
+}
+
 form label {
   display: block
+}
+
+.message {
+  padding: .3em .6em;
+}
+
+.message.error {
+  background: rgba(255,200,200,0.2);
+  color: rgb(200,0,0);
+  border: 2px solid rgb(200,0,0);
+}
+
+.message.info {
+
+  background: rgba(200,220,255,0.2);
+  color: rgb(20,90,200);
+  border: 2px solid rgb(20,90,200);
 }
