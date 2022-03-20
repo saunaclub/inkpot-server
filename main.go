@@ -63,7 +63,7 @@ func GetFeed(since *time.Time) []FeedItemJson {
 		SELECT id, filepath, channels, datetime
         FROM feed
         WHERE datetime > ?
-        ORDER BY datetime
+        ORDER BY datetime DESC
         LIMIT 10
     `, timestamp)
 	if err != nil {
