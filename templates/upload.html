@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Inkpot - Upload Image</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav>
+            <ul>
+                <li><a href="/">Global feed</a></li>
+                <li><a href="/upload">Add image</a></li>
+            </ul>
+        </nav>
+        <form method="POST" id="upload" action="/upload">
+           <label>
+               Channels, separated by comma: <input type="text" name="channel">
+           </label>
+           <label>
+               Image: <input type="file" accept="image/png, image/jpeg" name="file">
+           </label>
+           <input type="submit" value="Yeet!">
+        </form>
+    </body>
+</html>
