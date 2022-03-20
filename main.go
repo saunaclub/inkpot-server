@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -103,8 +104,15 @@ func getUploadHandler(c *gin.Context) {
 }
 
 func getFeedHandler(c *gin.Context) {
-	loc := time.FixedZone("UTC", 0)
-	t := time.Date(1970, time.January, 1, 0, 0, 0, 0, loc)
+	since, err := strconv.ParseInt(c.DefaultQuery("since", "0"), 10, 0)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "`since` is not a valid unix timestamp in seconds.",
+		})
+		return
+	}
+
+	t := time.Unix(since, 0)
 	feed := GetFeed(&t)
 
 	c.JSON(http.StatusOK, gin.H{
