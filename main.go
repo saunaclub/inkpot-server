@@ -99,6 +99,10 @@ func getIndexHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", nil)
 }
 
+func getAboutHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "about.html", nil)
+}
+
 func getUploadHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "upload.html", nil)
 }
@@ -187,6 +191,7 @@ func main() {
 
 	// Finally, set up the different routes
 	router.GET("/", getIndexHandler)
+	router.GET("/about", getAboutHandler)
 	router.GET("/feed", getFeedHandler)
 	router.GET("/upload", getUploadHandler)
 	router.POST("/upload", postUploadHandler)
