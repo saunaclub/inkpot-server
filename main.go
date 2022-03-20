@@ -43,7 +43,7 @@ func setupDb(dbPath string) *sql.DB {
 	}
 
 	initDb := `
-    	CREATE TABLE IF NOT EXISTS feed (
+		CREATE TABLE IF NOT EXISTS feed (
 			id	INTEGER	PRIMARY	KEY	AUTOINCREMENT	NOT	NULL,
 			filepath	TEXT	NOT	NULL,
 			channels	TEXT	NOT	NULL,
@@ -61,11 +61,11 @@ func GetFeed(since *time.Time) []FeedItemJson {
 	timestamp := since.Format(timefmt)
 	rows, err := conn.Query(`
 		SELECT id, filepath, channels, datetime
-        FROM feed
-        WHERE datetime > ?
-        ORDER BY datetime DESC
-        LIMIT 10
-    `, timestamp)
+		FROM feed
+		WHERE datetime > ?
+		ORDER BY datetime DESC
+		LIMIT 10
+	`, timestamp)
 	if err != nil {
 		log.Fatalf("Error generating feed: %s", err)
 	}
