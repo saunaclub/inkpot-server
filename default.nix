@@ -16,7 +16,7 @@ buildGoModule rec {
   meta = with lib; {
     description = "A smol social network spilling onto your e-paper display";
     homepage = "https://github.com/saunaclub/inkpot-server/";
-    license = licenses.gpl3Plus;
+    license = licenses.agpl3Plus;
     maintainers = with maintainers; [];
   };
 }
