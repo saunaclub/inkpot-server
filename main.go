@@ -108,14 +108,12 @@ func getUploadHandler(c *gin.Context) {
 }
 
 func parseTime(t string) (*time.Time, error) {
-	timestamp, err := strconv.ParseInt(t, 10, 0)
-	if err == nil {
+	if timestamp, err := strconv.ParseInt(t, 10, 0); err == nil {
 		t := time.Unix(timestamp, 0)
 		return &t, nil
 	}
 
-	rfc3339, err := time.Parse(time.RFC3339, t)
-	if err == nil {
+	if rfc3339, err := time.Parse(time.RFC3339, t); err == nil {
 		return &rfc3339, nil
 	}
 
