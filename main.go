@@ -175,8 +175,7 @@ func postUploadHandler(c *gin.Context) {
 	}
 
 	if _, err := conn.Exec(`
-		INSERT INTO feed (filepath, channels, datetime)
-		VALUES (?, ?, datetime("now"))
+		INSERT INTO feed (filepath, channels) VALUES (?, ?)
 	`, path, channels); err != nil {
 		log.Fatalf("Error creating database entry while uploading: %s", err)
 	}
