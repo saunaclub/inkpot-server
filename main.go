@@ -19,6 +19,7 @@ import (
 )
 
 var conn *sql.DB
+var sqliteTimefmt string = "2006-01-02 15:04:05"
 
 type FeedItemRaw struct {
 	Id       int
@@ -57,8 +58,7 @@ func setupDb(dbPath string) *sql.DB {
 }
 
 func GetFeed(since *time.Time) []FeedItemJson {
-	timefmt := "2006-01-02 15:04:05"
-	timestamp := since.Format(timefmt)
+	timestamp := since.Format(sqliteTimefmt)
 	rows, err := conn.Query(`
 		SELECT id, filepath, channels, datetime
 		FROM feed
@@ -78,7 +78,7 @@ func GetFeed(since *time.Time) []FeedItemJson {
 			log.Fatalf("Error fetching feed row: %s", err)
 		}
 
-		datetime, err := time.Parse(timefmt, item.Datetime)
+		datetime, err := time.Parse(sqliteTimefmt, item.Datetime)
 		if err != nil {
 			log.Fatalf("Error parsing datetime in row: %s", err)
 		}
@@ -107,17 +107,36 @@ func getUploadHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "upload.html", nil)
 }
 
+func parseTime(t string) (*time.Time, error) {
+	timestamp, err := strconv.ParseInt(t, 10, 0)
+	if err == nil {
+		t := time.Unix(timestamp, 0)
+		return &t, nil
+	}
+
+	rfc3339, err := time.Parse(time.RFC3339, t)
+	if err == nil {
+		return &rfc3339, nil
+	}
+
+	yyyymmddhhmmss, err := time.Parse(sqliteTimefmt, t)
+	if err == nil {
+		return &yyyymmddhhmmss, nil
+	}
+
+	return nil, err
+}
+
 func getFeedHandler(c *gin.Context) {
-	since, err := strconv.ParseInt(c.DefaultQuery("since", "0"), 10, 0)
+	since, err := parseTime(c.DefaultQuery("since", "0"))
 	if err != nil {
+		error := fmt.Sprintf("`since` can either be a unix timestamp in seconds, an RFC3339-formatted datetime or a datetime like `%s`", sqliteTimefmt)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "`since` is not a valid unix timestamp in seconds.",
+			"error": error,
 		})
 		return
 	}
-
-	t := time.Unix(since, 0)
-	feed := GetFeed(&t)
+	feed := GetFeed(since)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": feed,
