@@ -14,6 +14,10 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
+	"github.com/golang-migrate/migrate/v4"
+	sqlite3 "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	// http server
 	"github.com/gin-gonic/gin"
 )
@@ -36,24 +40,24 @@ type FeedItemJson struct {
 }
 
 func setupDb(dbPath string) *sql.DB {
-	var err error
-
-	conn, err = sql.Open("sqlite3", fmt.Sprintf("file:%s?_journal=WAL&_timeout=1000&_foreign_keys=1", dbPath))
+	dbPath = fmt.Sprintf("%s?_journal=WAL&_timeout=1000&_foreign_keys=1", dbPath)
+	conn, err := sql.Open("sqlite3", fmt.Sprintf("file:%s", dbPath))
 	if err != nil {
 		panic(err)
 	}
 
-	initDb := `
-		CREATE TABLE IF NOT EXISTS feed (
-			id	INTEGER	PRIMARY	KEY	AUTOINCREMENT	NOT	NULL,
-			filepath	TEXT	NOT	NULL,
-			channels	TEXT	NOT	NULL,
-			datetime	TEXT	NOT	NULL
-		)
-	`
-	if _, err := conn.Exec(initDb, nil); err != nil {
+	// Run migrations
+	driver, err := sqlite3.WithInstance(conn, &sqlite3.Config{})
+	if err != nil {
 		panic(err)
 	}
+
+	m, err := migrate.NewWithDatabaseInstance("file://migrations", "sqlite3", driver)
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		panic(err)
+	}
+	m.Close()
+
 	return conn
 }
 
