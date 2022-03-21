@@ -56,7 +56,6 @@ func setupDb(dbPath string) *sql.DB {
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		panic(err)
 	}
-	m.Close()
 
 	return conn
 }
